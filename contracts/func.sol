@@ -60,7 +60,9 @@ contract ERC721 is IERC721, IERC721Metadata {
 
     function approve(address to, uint256 tokenId) external {
         address ownerOfToken = _ownerOf[tokenId];
+        require(ownerOfToken != address(0), "ERC721: owner query for nonexistent token");
         require(to != ownerOfToken, "ERC721: approval to current owner");
+        require(to != address(0), "ERC721: approval to the zero address");
         require(
             msg.sender == ownerOfToken || _isApprovedForAll[ownerOfToken][msg.sender],
             "ERC721: approve caller is not owner nor approved for all"
@@ -75,13 +77,13 @@ contract ERC721 is IERC721, IERC721Metadata {
     function isApprovedOrOwner(address ownerOfToken, address spender, uint256 tokenId) internal view returns (bool){
         return (spender == ownerOfToken || _isApprovedForAll[ownerOfToken][spender] || spender == _approvals[tokenId]);
     }
-    function transferFrom(address from, address to, uint256 tokenId) public{
+    function transferFrom(address from, address to, uint256 tokenId) public {
         require(from == _ownerOf[tokenId], "ERC721: transfer of token that is not own");
         require(to != address(0), "ERC721: transfer to the zero address");
         require(isApprovedOrOwner(from, msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
 
-        _balanceOf[from] --;
-        _balanceOf[to] ++;
+        _balanceOf[from]--;
+        _balanceOf[to]++;
         _ownerOf[tokenId] = to;
         delete _approvals[tokenId];
         emit Transfer(from, to, tokenId);
